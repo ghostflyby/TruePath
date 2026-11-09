@@ -241,14 +241,21 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
     /// <remarks>
     /// This method checks if the specified path represents a file, directory, symbolic link, or junction. On Windows, it uses <see cref="DiskUtils.IsJunction"/> to identify junctions and checks for the <see cref="FileAttributes.ReparsePoint"/> flag to identify symbolic links.
     /// </remarks>
+    /// <exception cref="UnauthorizedAccessException">The caller doesn't have the permission to read the entry attributes.</exception>
+    /// <exception cref="IOException">
+    /// The entry attributes cannot be read for a reason other than the entry not existing, e.g. the path contains a name rejected by the file system.
+    /// </exception>
     public FileEntryKind? ReadKind()
     {
-        if (!File.Exists(Value) && !Directory.Exists(Value))
+        FileAttributes attributes;
+        try
+        {
+            attributes = File.GetAttributes(Value);
+        }
+        catch (Exception e) when (e is FileNotFoundException or DirectoryNotFoundException)
         {
             return null;
         }
-
-        var attributes = File.GetAttributes(Value);
 
         if (!attributes.HasFlag(FileAttributes.Directory))
         {
@@ -257,17 +264,10 @@ public readonly struct AbsolutePath : IEquatable<AbsolutePath>, IComparable<Abso
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            if (DiskUtils.IsJunction(Value))
+            if (attributes.HasFlag(FileAttributes.ReparsePoint) && DiskUtils.IsJunction(Value))
             {
                 return FileEntryKind.Junction;
             }
-
-            if (attributes.HasFlag(FileAttributes.ReparsePoint))
-            {
-                return FileEntryKind.Symlink;
-            }
-
-            return FileEntryKind.Directory;
         }
 
         if (attributes.HasFlag(FileAttributes.ReparsePoint))

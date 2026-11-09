@@ -1,5 +1,5 @@
 <!--
-SPDX-FileCopyrightText: 2024 Friedrich von Never <friedrich@fornever.me>
+SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 
 SPDX-License-Identifier: MIT
 -->
@@ -26,7 +26,32 @@ Use the following shell command:
 ```console
 $ dotnet test
 ```
-Tests involving symlink creation require elevated privileges on Windows, as this is enforced at the OS level.
+
+On Windows, tests that create symbolic links require either [Developer Mode][windows-developer-mode] or an elevated
+process. Developer Mode lets an unelevated process create symbolic links, as documented for the
+[`CreateSymbolicLinkW`][create-symbolic-link] API. When neither is available, these tests are skipped locally; CI
+runners fail instead, ensuring that the tests are not silently skipped in automation.
+
+Public API
+----------
+In TruePath, we track the changes made to the public API, for the package stability purposes.
+
+The public API of every packable project is recorded per target framework in the `PublicAPI/<target framework>/` directories:
+- `PublicAPI.Shipped.txt` lists the API of the latest release,
+- `PublicAPI.Unshipped.txt` lists the changes made since then.
+
+If you change the public API, the build-time diagnostic will report any difference as `RS0000`-style errors. These are warnings in local builds (for the development purpose) and errors on CI.
+
+To update the files, either use the code fix for these diagnostics in your IDE, or run the following shell command for every changed project, e.g.:
+```console
+$ dotnet format analyzers <path to project> --diagnostics RS0016 --severity info --include-generated
+```
+
+This command only updates one target framework per run, so you might need to run it several times.
+
+Removed members are not handled by this command, so they need to be removed separately:
+- if the member is listed in `PublicAPI.Unshipped.txt`, delete that line;
+- if the member is listed in `PublicAPI.Shipped.txt`, add a copy of that line prefixed with `*REMOVED*` to `PublicAPI.Unshipped.txt`.
 
 Test Documentation
 ------------------
@@ -73,6 +98,8 @@ Then run the following shell command:
 $ dotnet fsi scripts/github-actions.fsx
 ```
 
+[create-symbolic-link]: https://learn.microsoft.com/windows/win32/api/winbase/nf-winbase-createsymboliclinkw
 [dotnet-sdk]: https://dotnet.microsoft.com/en-us/download
 [powershell]: https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell
 [reuse]: https://reuse.software/
+[windows-developer-mode]: https://learn.microsoft.com/windows/apps/get-started/enable-your-device-for-development

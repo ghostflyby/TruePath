@@ -1,0 +1,12 @@
+// SPDX-FileCopyrightText: 2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+//
+// SPDX-License-Identifier: MIT
+
+CreateFile
+FILE_ACCESS_RIGHTS
+FILE_ATTRIBUTE_TAG_INFO
+GetFileInformationByHandleEx
+GetFinalPathNameByHandle
+HRESULT_FROM_WIN32
+IO_REPARSE_TAG_MOUNT_POINT
+WIN32_ERROR

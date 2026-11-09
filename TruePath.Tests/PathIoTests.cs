@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2025 Friedrich von Never <friedrich@fornever.me>
+// SPDX-FileCopyrightText: 2025-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
@@ -37,6 +37,21 @@ public class PathIoTests
             Assert.False(file.ExistsFile());
             Assert.True(file.ExistsDirectory());
             Assert.True(file.Exists());
+        });
+    }
+
+    [Fact]
+    public void GetFilesByLocalPathPatternTest()
+    {
+        DoWithTempFolder(tempFolder =>
+        {
+            var matchingFile = tempFolder / "matching.txt";
+            matchingFile.WriteAllText("test");
+            (tempFolder / "other.log").WriteAllText("test");
+
+            var files = tempFolder.GetFiles(new LocalPathPattern("*.txt"));
+
+            Assert.Equal([matchingFile], files);
         });
     }
 

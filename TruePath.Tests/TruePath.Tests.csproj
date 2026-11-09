@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
         <OutputType>Exe</OutputType>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
@@ -16,7 +16,7 @@ SPDX-License-Identifier: MIT
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FsCheck.Xunit.v3" Version="3.5.0" />
+        <PackageReference Include="FsCheck.Xunit.v3" Version="3.6.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" />
         <PackageReference Include="xunit.v3" Version="4.0.2" />
     </ItemGroup>
@@ -24,6 +24,8 @@ SPDX-License-Identifier: MIT
     <ItemGroup>
       <ProjectReference Include="..\TruePath.SystemIo\TruePath.SystemIo.csproj" />
       <ProjectReference Include="..\TruePath\TruePath.csproj" />
+      <!-- A plain reference (not an analyzer reference): lets the completeness test reuse the generator's rules. -->
+      <ProjectReference Include="..\TruePath.PathIoGenerator\TruePath.PathIoGenerator.csproj" />
     </ItemGroup>
 
 </Project>
