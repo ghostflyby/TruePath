@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 TruePath contributors <https://github.com/ForNeVeR/TruePath>
+// SPDX-FileCopyrightText: 2024-2026 TruePath contributors <https://github.com/ForNeVeR/TruePath>
 //
 // SPDX-License-Identifier: MIT
 
@@ -45,11 +45,15 @@ public class PathStringsTests
     }
 
     [Theory]
-    [InlineData(".", "")]
+    [InlineData("", ".")]
+    [InlineData(".", ".")]
+    [InlineData("./.", ".")]
+    [InlineData("./", ".")]
     [InlineData("./foo", "foo")]
     [InlineData("..", "..")]
     [InlineData("./..", "..")]
-    [InlineData("a/..", "")]
+    [InlineData("a/..", ".")]
+    [InlineData("a/../", ".")]
     [InlineData("a/../..", "..")]
     [InlineData("a/../../.", "..")]
     [InlineData("a/../../..", "../..")]
@@ -68,7 +72,7 @@ public class PathStringsTests
     [InlineData("../../../foo", "../../../foo")]
     [InlineData("../foo/..", "..")]
     [InlineData("...", "...")]
-    [InlineData(".../..", "")]
+    [InlineData(".../..", ".")]
     [InlineData(".../...", ".../...")]
     [InlineData(".../../...", "...")]
     [InlineData("foo/bar/../file.ext", "foo/file.ext")]

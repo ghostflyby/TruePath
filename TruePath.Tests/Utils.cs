@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Windows.Win32;
+using Windows.Win32.Foundation;
 using Xunit.v3;
 
 namespace TruePath.Tests;
@@ -42,6 +44,24 @@ public static class Utils
     internal static bool RunsOnCi()
     {
         return Environment.GetEnvironmentVariable("CI") is not null;
+    }
+
+    internal static void CreateSymbolicLinkOrSkip(Action createSymbolicLink)
+    {
+        try
+        {
+            createSymbolicLink();
+        }
+        catch (IOException e) when (OperatingSystem.IsWindows()
+                                    && e.HResult == PInvoke.HRESULT_FROM_WIN32(WIN32_ERROR.ERROR_PRIVILEGE_NOT_HELD).Value)
+        {
+            Assert.False(
+                RunsOnCi(),
+                "CI runners must allow symbolic link creation so these tests are not skipped silently.");
+            Assert.Skip(
+                "Creating symbolic links on Windows requires Developer Mode or an elevated process. " +
+                "See CONTRIBUTING.md for setup instructions.");
+        }
     }
 
     /// <summary>
